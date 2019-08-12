@@ -2,13 +2,17 @@ package com.example.customtasks
 
 import android.os.Build
 import android.util.Log
+import android.widget.Chronometer
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
 import java.text.SimpleDateFormat
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Entity(tableName = "items")
 class Item (): Serializable{
@@ -32,21 +36,36 @@ class Item (): Serializable{
     fun start(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val current = LocalDateTime.now()
-            val last = LocalDateTime.now()
-
-            val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss")
-            var answer: String =  current.format(formatter)
+            val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+            startTime = current.format(formatter)
         } else {
-            var date = Date();
-            date.
-            val formatter = SimpleDateFormat("MMM dd yyyy HH:mma")
-            val answer: String = formatter.format(date)
+            var date = Date()
+            val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+            startTime = formatter.format(date)
         }
-        startTime =
+        taskInProgress = true
     }
 
     fun stop(){
-
+        if (startTime.isNotEmpty()) {
+            var minutes:Long = 0
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+                val last = formatter.parse(startTime) as LocalDateTime
+                val current = LocalDateTime.now()
+                minutes = ChronoUnit.MINUTES.between(current, last)
+            }
+            else{
+                val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+                val last = formatter.parse(startTime)
+                val current = Date()
+                val timeUnit = TimeUnit.valueOf("dd.MM.yyyy HH:mm:ss")
+                minutes = Duration.between(current.toInstant(), last.toInstant()).toMinutes()
+                minutes = ChronoUnit.MINUTES.between(current, last)
+            }
+            duration += minutes
+        }
+        startTime = ""
     }
 
 }
