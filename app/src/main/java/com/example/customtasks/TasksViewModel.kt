@@ -8,7 +8,7 @@ class TasksViewModel(application : Application) : AndroidViewModel(application){
     val repository = TasksRepository(application)
     var tasks = repository.getAllTasks()
 
-    fun getAll(): LiveData<MutableList<Task>>{
+    fun getAll(): LiveData<List<Task>>{
         return tasks
     }
 

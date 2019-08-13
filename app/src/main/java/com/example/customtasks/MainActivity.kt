@@ -6,34 +6,22 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-
     companion object{
         const val CHANGE_ITEM_REQUEST = 1
         const val CREATE_ITEM_REQUEST = 2
     }
 
-    lateinit var tasksViewModel: TasksViewModel
+    lateinit var tasksViewModel : TasksViewModel
     lateinit var linearLayoutManager : LinearLayoutManager
     lateinit var tasksAdapter : TasksAdapter
-
-
-    private val recyclerView by lazy(LazyThreadSafetyMode.NONE){
-        findViewById<RecyclerView>(R.id.tasksView)
-    }
-
-    private val toolBar by lazy (LazyThreadSafetyMode.NONE){
-        findViewById<Toolbar>(R.id.appbarlayout_tool_bar)
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,11 +29,10 @@ class MainActivity : AppCompatActivity() {
         initRecyclerView()
         initToolbar()
         tasksViewModel = ViewModelProviders.of(this).get(TasksViewModel::class.java)
-        tasksViewModel.getAll().observe(this,  Observer<MutableList<Task>>{tasksAdapter.updateTasks(it)})
-
+        tasksViewModel.getAll().observe(this,  Observer<List<Task>>{tasksAdapter.setItems(it)})
     }
 
-    fun initToolbar(){
+    private fun initToolbar(){
         toolBar.inflateMenu(R.menu.toolbar_menu)
         toolBar.title = "Tasks"
         toolBar.setOnMenuItemClickListener{
@@ -54,16 +41,19 @@ class MainActivity : AppCompatActivity() {
                 R.id.addNewTask -> {
                     createNewTask()
                 }
+                R.id.updateTasksDurations -> {
+                    updateTasksDurations()
+                }
             }
             true
         }
     }
 
-    fun initRecyclerView(){
+    private fun initRecyclerView(){
         tasksAdapter = TasksAdapter()
-        recyclerView.adapter = tasksAdapter
+        tasksView.adapter = tasksAdapter
         linearLayoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = linearLayoutManager
+        tasksView.layoutManager = linearLayoutManager
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
             override fun onMove(
@@ -77,40 +67,48 @@ class MainActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 deleteTask(viewHolder.adapterPosition)
             }
-        }).attachToRecyclerView(recyclerView)
-
+        }).attachToRecyclerView(tasksView)
         tasksAdapter.onTaskEditClicked = {position : Int -> changeTask(position)}
         tasksAdapter.onTaskStartClicked = {position : Int, isStarted: Boolean ->
-            updateTask(tasksAdapter.getTask(position), isStarted)}
+            updateTask(tasksAdapter.getItem(position), isStarted)}
     }
 
-    fun createNewTask(){
+    private fun createNewTask(){
         val intent = Intent(this, TaskEditActivity::class.java)
         intent.putExtra(TaskEditActivity.ITEM_OBJECT, Task())
         intent.putExtra(TaskEditActivity.ITEM_NUMBER, tasksAdapter.itemCount)
         startActivityForResult(intent, CREATE_ITEM_REQUEST)
     }
 
-    fun changeTask(position : Int){
+    private fun changeTask(position : Int){
         val intent = Intent(this, TaskEditActivity::class.java)
-        intent.putExtra(TaskEditActivity.ITEM_OBJECT, tasksAdapter.getTask(position))
+        intent.putExtra(TaskEditActivity.ITEM_OBJECT, tasksAdapter.getItem(position))
         intent.putExtra(TaskEditActivity.ITEM_NUMBER, position)
         startActivityForResult(intent, CHANGE_ITEM_REQUEST)
     }
 
-    fun deleteTask(position : Int){
-        tasksViewModel.delete(tasksAdapter.getTask(position))
+    private fun deleteTask(position : Int){
+        tasksViewModel.delete(tasksAdapter.getItem(position))
     }
 
-    fun updateTask(task : Task, isStarted : Boolean){
-        task.onTaskStop = {stopTime, duration ->
+    private fun updateTask(task : Task, isStarted : Boolean){
+        task.onTaskStop = {_, duration ->
             Toast.makeText(this, "This task take ${duration/60} minutes", Toast.LENGTH_LONG).show()
         }
-        task.onTaskStart = {startTime, duration ->
+        task.onTaskStart = {_, duration ->
             Toast.makeText(this, "Start task that already take ${duration/60} minutes", Toast.LENGTH_LONG).show()
         }
         task.trigger()
         tasksViewModel.update(task)
+    }
+
+    private fun updateTasksDurations(){
+        for(i in 0 until tasksAdapter.itemCount){
+            val task = Task(tasksAdapter.getItem(i))
+            if (task.updateDuration()) {
+                tasksViewModel.update(task)
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -146,6 +144,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }

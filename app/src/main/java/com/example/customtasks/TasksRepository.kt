@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 
 class TasksRepository(application : Application){
     private var taskDao : TaskDao
-    private var tasks : LiveData<MutableList<Task>>
+    private var tasks : LiveData<List<Task>>
 
     init{
         val database = TasksDatabase.getInstance(application)
@@ -15,55 +15,37 @@ class TasksRepository(application : Application){
     }
 
     fun insertTask (task : Task){
-        InsertTaskAsyncTask(taskDao).execute(task)
+        doAsync{
+            taskDao.insert(task)
+        }.execute()
     }
 
     fun updateTask (task : Task){
-        UpdateTaskAsyncTask(taskDao).execute(task)
+        doAsync{
+            taskDao.update(task)
+        }.execute()
     }
 
     fun deleteTask (task : Task){
-        DeleteTaskAsyncTask(taskDao).execute(task)
+        doAsync{
+            taskDao.delete(task)
+        }.execute()
     }
 
     fun deleteAllTasks (){
-        DeleteAllTasksAsyncTask(taskDao).execute()
+        doAsync{
+            taskDao.deleteAllTasks()
+        }.execute()
     }
 
-    fun getAllTasks(): LiveData<MutableList<Task>>{
+    fun getAllTasks(): LiveData<List<Task>>{
         return tasks
     }
 
-    private class InsertTaskAsyncTask(private val taskDao: TaskDao) :
-        AsyncTask<Task, Void, Void>() {
-        override fun doInBackground(vararg tasks: Task): Void? {
-            taskDao.insert(tasks[0])
+    class doAsync(val databaseOperation: () -> Unit) : AsyncTask<Void, Void, Void>() {
+        override fun doInBackground(vararg params: Void?): Void? {
+            databaseOperation()
             return null
         }
     }
-
-    private class DeleteAllTasksAsyncTask(private val taskDao: TaskDao) :
-        AsyncTask<Void, Void, Void>() {
-        override fun doInBackground(vararg voids: Void): Void? {
-            taskDao.deleteAllTasks()
-            return null
-        }
-    }
-
-    private class UpdateTaskAsyncTask(private val taskDao: TaskDao) :
-        AsyncTask<Task, Void, Void>() {
-        override fun doInBackground(vararg tasks: Task): Void? {
-            taskDao.update(tasks[0])
-            return null
-        }
-    }
-
-    private class DeleteTaskAsyncTask(private val taskDao: TaskDao) :
-        AsyncTask<Task, Void, Void>() {
-        override fun doInBackground(vararg tasks: Task): Void? {
-            taskDao.delete(tasks[0])
-            return null
-        }
-    }
-
 }

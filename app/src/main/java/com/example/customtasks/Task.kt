@@ -25,25 +25,41 @@ class Task (): Serializable{
         this.data = data
     }
 
+    constructor(task : Task) : this(task.name, task.data){
+        this.id = task.id
+        this.duration = task.duration
+        this.startTime = task.startTime
+    }
+
     @Ignore
-    var onTaskStart = fun(startTime:String, duration:Long){}
+    lateinit var onTaskStart : (startTime:String, duration:Long)->Unit
     @Ignore
-    var onTaskStop = fun(stopTime:String, duration:Long){}
+    lateinit var onTaskStop : (stopTime:String, duration:Long)->Unit
 
     fun trigger(){
         if (startTime.isNotEmpty()) {
-            val lastMoment : Instant = Instant.parse(startTime)
-            val thisMoment : Instant = Instant.now()
-            val difference = Duration.millis(thisMoment.millis - lastMoment.millis)
-            duration += difference.toStandardSeconds().seconds
+            updateDuration()
             startTime = ""
-            onTaskStop(thisMoment.toString(), duration)
+            onTaskStop(Instant.now().toString(), duration)
         }
         else{
             val instant = Instant.now()
             startTime = instant.toString()
             onTaskStart(startTime, duration)
         }
+    }
+
+    fun updateDuration() : Boolean{
+        var updated = false
+        if (startTime.isNotEmpty()){
+            val lastMoment : Instant = Instant.parse(startTime)
+            val thisMoment : Instant = Instant.now()
+            val difference = Duration.millis(thisMoment.millis - lastMoment.millis).toStandardSeconds().seconds
+            updated = difference > 0
+            duration += difference
+            startTime = Instant.now().toString()
+        }
+        return updated
     }
 
 }

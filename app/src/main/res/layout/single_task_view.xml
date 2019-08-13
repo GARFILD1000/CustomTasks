@@ -6,11 +6,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
         android:background="@color/grayLight"
-        android:gravity="top"
+        android:gravity="center_vertical"
         >
     <TextView
             android:id="@+id/taskNameTextView"
-            android:maxWidth="300dp"
             android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -18,7 +17,18 @@
             android:lines="1"
             android:ellipsize="end"
             android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@id/timeTextView"
+            style="@style/TextLarge"
+    />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="hh:mm"
+            android:lines="1"
+            android:ellipsize="end"
+            android:id="@+id/timeTextView"
             android:layout_toLeftOf="@id/taskStartButton"
+            android:layout_margin="10dp"
             style="@style/TextLarge"
     />
     <CheckBox
@@ -27,8 +37,17 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:button="@drawable/button_start"
-            android:layout_toLeftOf="@+id/editTaskButton"
+            android:layout_toLeftOf="@id/editTaskButton"
     />
+    <!--<ImageView-->
+            <!--android:id="@+id/timeImageView"-->
+            <!--android:layout_width="48dp"-->
+            <!--android:layout_height="48dp"-->
+            <!--android:layout_margin="10dp"-->
+            <!--app:srcCompat="@drawable/ic_time"-->
+            <!--android:backgroundTint="@color/transparent"-->
+            <!--android:layout_toLeftOf="@id/timeTextView"-->
+    <!--/>-->
     <ImageButton
             android:id="@+id/editTaskButton"
             android:layout_width="48dp"
