@@ -10,65 +10,65 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 
-class ItemsAdapter: RecyclerView.Adapter<ItemsAdapter.ItemsHolder>() {
-    private var items : MutableList<Item> = LinkedList()
+class TasksAdapter: RecyclerView.Adapter<TasksAdapter.TasksHolder>() {
+    private var tasks : MutableList<Task> = LinkedList()
 
-    var onItemEditClicked = fun(position: Int): Unit = null!!
+    var onTaskEditClicked = fun(position: Int): Unit = null!!
     var onTaskStartClicked = fun(position: Int, isStarted: Boolean): Unit = null!!
 
 
-    fun addItem(newItem : Item){
-        items.add(newItem)
-        notifyItemInserted(items.size-1)
+    fun addTask(newTask : Task){
+        tasks.add(newTask)
+        notifyItemInserted(tasks.size-1)
     }
 
-    fun removeAllItems(){
-        val previousSize = items.size
-        items.clear()
+    fun removeAllTasks(){
+        val previousSize = tasks.size
+        tasks.clear()
         notifyItemRangeRemoved(0, previousSize)
     }
 
-    fun removeItemAt(position : Int){
-        if(position < items.size) {
-            items.removeAt(position)
+    fun removeTaskAt(position : Int){
+        if(position < tasks.size) {
+            tasks.removeAt(position)
             notifyItemRemoved(position)
         }
     }
 
-    fun getItem(position : Int) : Item{
-        return items[position]
+    fun getTask(position : Int) : Task{
+        return tasks[position]
     }
 
-    fun setItem(position : Int, item : Item){
-        if(position < items.size){
-            items[position] = item
+    fun setTask(position : Int, task : Task){
+        if(position < tasks.size){
+            tasks[position] = task
             notifyItemChanged(position)
         }
     }
 
-    fun updateItems(newItems: MutableList<Item>){
-        items.clear()
-        items.addAll(newItems)
+    fun updateTasks(newTasks: MutableList<Task>){
+        tasks.clear()
+        tasks.addAll(newTasks)
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemsHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TasksHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.single_item_view, parent, false)
-        return ItemsHolder(view)
+            .inflate(R.layout.single_task_view, parent, false)
+        return TasksHolder(view)
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return tasks.size
     }
 
-    override fun onBindViewHolder(holder: ItemsHolder, position: Int) {
-        holder.bind(items[position])
+    override fun onBindViewHolder(holder: TasksHolder, position: Int) {
+        holder.bind(tasks[position])
     }
 
-    inner class ItemsHolder(private var view : View) : RecyclerView.ViewHolder(view){
+    inner class TasksHolder(private var view : View) : RecyclerView.ViewHolder(view){
         val nameTextView : TextView by lazy(LazyThreadSafetyMode.NONE){
-            view.findViewById<TextView>(R.id.itemNameTextView)
+            view.findViewById<TextView>(R.id.taskNameTextView)
         }
 
         val taskStartButton : CheckBox by lazy(LazyThreadSafetyMode.NONE){
@@ -82,13 +82,13 @@ class ItemsAdapter: RecyclerView.Adapter<ItemsAdapter.ItemsHolder>() {
         init{
         }
 
-        fun bind(item : Item ){
-            nameTextView.setText(item.name)
+        fun bind(task : Task ){
+            nameTextView.setText(task.name)
             taskStartButton.setOnClickListener{view -> onTaskStartClicked(layoutPosition, taskStartButton.isChecked)}
             //val onCheckedChangeListener = CompoundButton.OnCheckedChangeListener{buttonView, isChecked -> onTaskStartClicked(layoutPosition, isChecked)}
-            taskStartButton.isChecked = item.startTime.isNotEmpty()
+            taskStartButton.isChecked = task.startTime.isNotEmpty()
             //taskStartButton.setOnCheckedChangeListener(onCheckedChangeListener)
-            taskEditButton.setOnClickListener{buttonView -> onItemEditClicked(layoutPosition)}
+            taskEditButton.setOnClickListener{buttonView -> onTaskEditClicked(layoutPosition)}
 
         }
     }

@@ -8,13 +8,13 @@
     tools:context=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/itemsView"
+            android:id="@+id/tasksView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
             android:scrollbarSize="2dp"
             android:fadeScrollbars="false"
-            tools:listitem="@layout/single_item_view"
+            tools:listitem="@layout/single_task_view"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <com.google.android.material.appbar.AppBarLayout

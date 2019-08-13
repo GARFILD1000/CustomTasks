@@ -5,20 +5,20 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Item::class], version = 1)
-abstract class ItemsDatabase : RoomDatabase(){
-    abstract fun itemDao() : ItemDao
+@Database(entities = [Task::class], version = 1)
+abstract class TasksDatabase : RoomDatabase(){
+    abstract fun taskDao() : TaskDao
 
     companion object {
-        private var instance: ItemsDatabase? = null
+        private var instance: TasksDatabase? = null
 
-        fun getInstance(context : Context): ItemsDatabase?{
+        fun getInstance(context : Context): TasksDatabase?{
             if (instance == null){
-                synchronized(ItemsDatabase::class){
+                synchronized(TasksDatabase::class){
                     instance = Room.databaseBuilder(
                         context.applicationContext,
-                        ItemsDatabase::class.java,
-                        "items.db")
+                        TasksDatabase::class.java,
+                        "tasks.db")
                         .build()
                 }
             }

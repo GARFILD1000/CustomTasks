@@ -1,7 +1,6 @@
 package com.example.customtasks
 
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -13,8 +12,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import org.joda.time.JodaTimePermission
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,13 +21,13 @@ class MainActivity : AppCompatActivity() {
         const val CREATE_ITEM_REQUEST = 2
     }
 
-    lateinit var itemsViewModel: ItemsViewModel
+    lateinit var tasksViewModel: TasksViewModel
     lateinit var linearLayoutManager : LinearLayoutManager
-    lateinit var itemsAdapter : ItemsAdapter
+    lateinit var tasksAdapter : TasksAdapter
 
 
     private val recyclerView by lazy(LazyThreadSafetyMode.NONE){
-        findViewById<RecyclerView>(R.id.itemsView)
+        findViewById<RecyclerView>(R.id.tasksView)
     }
 
     private val toolBar by lazy (LazyThreadSafetyMode.NONE){
@@ -42,12 +39,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initRecyclerView()
-        itemsViewModel = ViewModelProviders.of(this).get(ItemsViewModel::class.java)
-        itemsViewModel.getAll().observe(this,  Observer<MutableList<Item>>{itemsAdapter.updateItems(it)})
+        initToolbar()
+        tasksViewModel = ViewModelProviders.of(this).get(TasksViewModel::class.java)
+        tasksViewModel.getAll().observe(this,  Observer<MutableList<Task>>{tasksAdapter.updateTasks(it)})
+
+    }
+
+    fun initToolbar(){
         toolBar.inflateMenu(R.menu.toolbar_menu)
         toolBar.title = "Tasks"
         toolBar.setOnMenuItemClickListener{
-            item ->
+                item ->
             when(item.itemId){
                 R.id.addNewTask -> {
                     createNewTask()
@@ -58,8 +60,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun initRecyclerView(){
-        itemsAdapter = ItemsAdapter()
-        recyclerView.adapter = itemsAdapter
+        tasksAdapter = TasksAdapter()
+        recyclerView.adapter = tasksAdapter
         linearLayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = linearLayoutManager
 
@@ -77,71 +79,70 @@ class MainActivity : AppCompatActivity() {
             }
         }).attachToRecyclerView(recyclerView)
 
-        itemsAdapter.onItemEditClicked = {position : Int -> changeTask(position)}
-        itemsAdapter.onTaskStartClicked = {position : Int, isStarted: Boolean ->
-            updateTask(itemsAdapter.getItem(position), isStarted)}
+        tasksAdapter.onTaskEditClicked = {position : Int -> changeTask(position)}
+        tasksAdapter.onTaskStartClicked = {position : Int, isStarted: Boolean ->
+            updateTask(tasksAdapter.getTask(position), isStarted)}
     }
 
     fun createNewTask(){
-        val intent = Intent(this, ItemEditActivity::class.java)
-        intent.putExtra(ItemEditActivity.ITEM_OBJECT, Item())
-        intent.putExtra(ItemEditActivity.ITEM_NUMBER, itemsAdapter.itemCount)
+        val intent = Intent(this, TaskEditActivity::class.java)
+        intent.putExtra(TaskEditActivity.ITEM_OBJECT, Task())
+        intent.putExtra(TaskEditActivity.ITEM_NUMBER, tasksAdapter.itemCount)
         startActivityForResult(intent, CREATE_ITEM_REQUEST)
     }
 
     fun changeTask(position : Int){
-        val intent = Intent(this, ItemEditActivity::class.java)
-        intent.putExtra(ItemEditActivity.ITEM_OBJECT, itemsAdapter.getItem(position))
-        intent.putExtra(ItemEditActivity.ITEM_NUMBER, position)
+        val intent = Intent(this, TaskEditActivity::class.java)
+        intent.putExtra(TaskEditActivity.ITEM_OBJECT, tasksAdapter.getTask(position))
+        intent.putExtra(TaskEditActivity.ITEM_NUMBER, position)
         startActivityForResult(intent, CHANGE_ITEM_REQUEST)
     }
 
     fun deleteTask(position : Int){
-        itemsViewModel.delete(itemsAdapter.getItem(position))
+        tasksViewModel.delete(tasksAdapter.getTask(position))
     }
 
-    fun updateTask(item : Item, isStarted : Boolean){
-        item.onTaskStop = {stopTime, duration ->
+    fun updateTask(task : Task, isStarted : Boolean){
+        task.onTaskStop = {stopTime, duration ->
             Toast.makeText(this, "This task take ${duration/60} minutes", Toast.LENGTH_LONG).show()
         }
-        item.onTaskStart = {startTime, duration ->
-            Toast.makeText(this, "Start task that take ${duration/60} minutes", Toast.LENGTH_LONG).show()
+        task.onTaskStart = {startTime, duration ->
+            Toast.makeText(this, "Start task that already take ${duration/60} minutes", Toast.LENGTH_LONG).show()
         }
-        item.trigger()
-        itemsViewModel.update(item)
+        task.trigger()
+        tasksViewModel.update(task)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == CHANGE_ITEM_REQUEST && resultCode == RESULT_OK) {
-            val item = data!!.getSerializableExtra(ItemEditActivity.ITEM_OBJECT) as Item
-            itemsViewModel.update(item)
+            val task = data!!.getSerializableExtra(TaskEditActivity.ITEM_OBJECT) as Task
+            tasksViewModel.update(task)
         }
         if (requestCode == CREATE_ITEM_REQUEST && resultCode == RESULT_OK) {
-            val item = data!!.getSerializableExtra(ItemEditActivity.ITEM_OBJECT) as Item
-            itemsViewModel.insert(item)
+            val task = data!!.getSerializableExtra(TaskEditActivity.ITEM_OBJECT) as Task
+            tasksViewModel.insert(task)
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.items_list_menu, menu)
+        menuInflater.inflate(R.menu.tasks_list_menu, menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        return when(item.itemId){
+    override fun onOptionsItemSelected(task: MenuItem): Boolean {
+        return when(task.itemId){
             R.id.addNewTask -> {
                 createNewTask()
                 true
             }
             R.id.deleteAllTasks -> {
-                itemsViewModel.deleteAll()
+                tasksViewModel.deleteAll()
                 true
             }
             else -> {
-                super.onOptionsItemSelected(item)
+                super.onOptionsItemSelected(task)
             }
         }
     }

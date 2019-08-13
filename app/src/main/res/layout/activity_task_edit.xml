@@ -9,7 +9,7 @@
 
     android:focusableInTouchMode="true"
 
-    tools:context=".ItemEditActivity">
+    tools:context=".TaskEditActivity">
 
     <EditText
             android:id="@+id/taskNameEditText"

@@ -1,23 +1,14 @@
 package com.example.customtasks
 
-import android.os.Build
-import android.util.Log
-import android.widget.Chronometer
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import org.joda.time.Duration
 import org.joda.time.Instant
 import java.io.Serializable
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.util.*
-import java.util.concurrent.TimeUnit
 
-@Entity(tableName = "items")
-class Item (): Serializable{
+@Entity(tableName = "tasks")
+class Task (): Serializable{
 
     @PrimaryKey(autoGenerate = true)
     var id : Int = 0
