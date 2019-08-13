@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.CompoundButton
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
@@ -12,8 +13,8 @@ import java.util.*
 class ItemsAdapter: RecyclerView.Adapter<ItemsAdapter.ItemsHolder>() {
     private var items : MutableList<Item> = LinkedList()
 
-    var onItemClicked = fun(position: Int): Unit = null!!
-    var onTaskStartClicked = fun(item: Item, isStarted: Boolean): Unit = null!!
+    var onItemEditClicked = fun(position: Int): Unit = null!!
+    var onTaskStartClicked = fun(position: Int, isStarted: Boolean): Unit = null!!
 
 
     fun addItem(newItem : Item){
@@ -66,10 +67,6 @@ class ItemsAdapter: RecyclerView.Adapter<ItemsAdapter.ItemsHolder>() {
     }
 
     inner class ItemsHolder(private var view : View) : RecyclerView.ViewHolder(view){
-        init{
-            view.setOnClickListener{v -> onItemClicked(layoutPosition)}
-        }
-
         val nameTextView : TextView by lazy(LazyThreadSafetyMode.NONE){
             view.findViewById<TextView>(R.id.itemNameTextView)
         }
@@ -78,11 +75,21 @@ class ItemsAdapter: RecyclerView.Adapter<ItemsAdapter.ItemsHolder>() {
             view.findViewById<CheckBox>(R.id.taskStartButton)
         }
 
+        val taskEditButton : ImageButton by lazy(LazyThreadSafetyMode.NONE){
+            view.findViewById<ImageButton>(R.id.editTaskButton)
+        }
+
+        init{
+        }
 
         fun bind(item : Item ){
             nameTextView.setText(item.name)
-            val onCheckedChangeListener = CompoundButton.OnCheckedChangeListener{buttonView, isChecked -> onTaskStartClicked(item, isChecked)}
-           // taskStartButton.set
+            taskStartButton.setOnClickListener{view -> onTaskStartClicked(layoutPosition, taskStartButton.isChecked)}
+            //val onCheckedChangeListener = CompoundButton.OnCheckedChangeListener{buttonView, isChecked -> onTaskStartClicked(layoutPosition, isChecked)}
+            taskStartButton.isChecked = item.startTime.isNotEmpty()
+            //taskStartButton.setOnCheckedChangeListener(onCheckedChangeListener)
+            taskEditButton.setOnClickListener{buttonView -> onItemEditClicked(layoutPosition)}
+
         }
     }
 }

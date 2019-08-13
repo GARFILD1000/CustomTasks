@@ -36,9 +36,8 @@ class ItemEditActivity : AppCompatActivity(){
         itemNumber = intent.getIntExtra(ITEM_NUMBER, 0)
         taskNameEditText.setText(item.name)
         taskDescEditText.setText(item.data)
-
+        supportActionBar!!.title = "Task Editing"
         button.setOnClickListener{v -> saveItem()}
-
     }
 
     private fun saveItem(){

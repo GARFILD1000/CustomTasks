@@ -8,21 +8,36 @@
     tools:context=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/itemsView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:scrollbarSize="2dp"
-        android:fadeScrollbars="false"
-        tools:listitem="@layout/single_item_view"/>
+            android:id="@+id/itemsView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:scrollbarSize="2dp"
+            android:fadeScrollbars="false"
+            tools:listitem="@layout/single_item_view"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/addTaskButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@drawable/ic_add"
-            android:backgroundTint="@color/colorAccent"/>
+    <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/appbarlayout_tool_bar"
+                android:background="@color/colorPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_scrollFlags="scroll|snap|enterAlways"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton-->
+            <!--android:id="@+id/addTaskButton"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="bottom|end"-->
+            <!--android:layout_margin="@dimen/fab_margin"-->
+            <!--app:srcCompat="@drawable/ic_add"-->
+            <!--android:backgroundTint="@color/colorAccent"/>-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

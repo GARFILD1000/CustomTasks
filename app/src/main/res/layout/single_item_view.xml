@@ -6,7 +6,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
         android:background="@color/grayLight"
-        android:gravity="center_vertical">
+        android:gravity="top"
+        >
     <TextView
             android:id="@+id/itemNameTextView"
             android:maxWidth="300dp"
@@ -18,12 +19,22 @@
             style="@style/TextLarge"
     />
     <CheckBox
-            android:layout_alignParentRight="true"
             android:id="@+id/taskStartButton"
             android:layout_margin="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:button="@drawable/button_start"
+            android:layout_toLeftOf="@+id/editTaskButton"
+    />
+    <ImageButton
+            android:id="@+id/editTaskButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="10dp"
+            app:srcCompat="@drawable/ic_edit"
             android:backgroundTint="@color/transparent"
+            android:layout_alignParentRight="true"
     />
 </RelativeLayout>
+
+        <!--android:tint="@color/colorAccent"-->
